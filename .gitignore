@@ -28,8 +28,18 @@ esp32_firmware/config.h
 
 # Data files
 *.csv
-*.json
 *.log
+
+# JSON data files (but keep config files)
+data/*.json
+output/*.json
+
+# Keep important JSON config files
+!vercel.json
+!package.json
+!tsconfig.json
+!manifest.json
+!web_dashboard/manifest.json
 
 # Plots and outputs
 *.png
