@@ -1,0 +1,49 @@
+# How to Enable Full Simulated Mode
+
+If the MQ135 sensor isn't working and you want to test the system with simulated data:
+
+## Option 1: Automatic Fallback (Current)
+The code automatically uses simulated data when sensor reads 0.
+You should see: "⚠️ Sensor reading 0 - Using SIMULATED data for testing"
+
+## Option 2: Force Simulated Mode (Always)
+
+Edit `envitrack.ino` and replace the `readAirQuality()` function with this:
+
+```cpp
+float readAirQuality() {
+  // SIMULATED MODE - Always return fake data
+  Serial.println("📊 Using SIMULATED air quality data (sensor disabled)");
+  
+  // Generate realistic varying data
+  static float baseValue = 450.0;
+  baseValue += random(-20, 20);  // Add some variation
+  
+  // Keep in reasonable range
+  if (baseValue < 300) baseValue = 300;
+  if (baseValue > 800) baseValue = 800;
+  
+  return baseValue;
+}
+```
+
+This will:
+- Always return simulated data (300-800 ppm)
+- Vary slightly each reading (realistic)
+- Never try to read the actual sensor
+- Let you test the entire system
+
+## Option 3: Fixed Test Value
+
+For consistent testing:
+
+```cpp
+float readAirQuality() {
+  Serial.println("📊 Using FIXED test value: 500 ppm");
+  return 500.0;  // Always return 500 ppm
+}
+```
+
+## To Switch Back to Real Sensor
+
+When you fix the sensor, just restore the original `readAirQuality()` function.

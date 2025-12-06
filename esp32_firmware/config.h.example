@@ -1,0 +1,29 @@
+/*
+ * EnviTrack Configuration Template
+ * Copy this file to config.h and fill in your credentials
+ */
+
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// WiFi Configuration
+#define WIFI_SSID "Your_WiFi_Network_Name"
+#define WIFI_PASSWORD "Your_WiFi_Password"
+
+// Firebase Configuration
+#define FIREBASE_HOST "https://ecomonitor-e79ca-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH ""  // Leave empty for public write, or add API key for auth
+
+// Sensor Pin Configuration
+#define DHT_PIN 4         // DHT22 data pin
+#define MQ135_PIN 34      // MQ135 analog pin (ADC1_CH6)
+
+// Timing Configuration
+#define READING_INTERVAL 60000  // Time between readings in milliseconds (60000 = 1 minute)
+#define MAX_RETRIES 3           // Maximum upload retry attempts
+#define RETRY_DELAY 2000        // Delay between retries in milliseconds
+
+// Device Configuration
+#define DEVICE_ID "ESP32_001"   // Unique identifier for this device
+
+#endif

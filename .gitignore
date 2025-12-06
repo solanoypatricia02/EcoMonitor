@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Environment variables (IMPORTANT: Never commit these!)
+.env
+python_backend/.env
+
+# Firebase credentials (IMPORTANT: Never commit these!)
+*serviceAccountKey.json
+firebase-adminsdk*.json
+
+# Arduino/ESP32 (Contains WiFi passwords and API keys)
+esp32_firmware/config.h
+
+# Keep example files
+!.env.example
+!config.h.example
+
+# Data files
+*.csv
+*.json
+*.log
+
+# Plots and outputs
+*.png
+*.jpg
+*.pdf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
