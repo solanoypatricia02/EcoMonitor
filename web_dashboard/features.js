@@ -9,7 +9,8 @@ let thresholds = {
     humidityMax: 80,
     airMax: 600,
     alertSound: 'default',
-    heartbeatSound: true
+    heartbeatSound: true,
+    backgroundAlertSound: true
 };
 
 // Make thresholds globally accessible
@@ -17,6 +18,10 @@ window.thresholds = thresholds;
 
 let darkMode = false;
 let allDataHistory = [];
+
+// Background alert sound tracking
+let backgroundAlertIntervals = {};
+let activeAlerts = {};
 
 // ========== INITIALIZATION ==========
 function initializeFeatures() {
@@ -118,6 +123,10 @@ function updateSettingsUI() {
     // Handle checkbox for heartbeat sound
     const heartbeatEl = document.getElementById('heartbeatSound');
     if (heartbeatEl) heartbeatEl.checked = thresholds.heartbeatSound;
+    
+    // Handle checkbox for background alert sound
+    const backgroundAlertEl = document.getElementById('backgroundAlertSound');
+    if (backgroundAlertEl) backgroundAlertEl.checked = thresholds.backgroundAlertSound !== false;
 }
 
 function saveSettings() {
@@ -128,7 +137,8 @@ function saveSettings() {
         humidityMax: parseFloat(document.getElementById('humidityMax').value),
         airMax: parseFloat(document.getElementById('airMax').value),
         alertSound: document.getElementById('alertSound').value,
-        heartbeatSound: document.getElementById('heartbeatSound').checked
+        heartbeatSound: document.getElementById('heartbeatSound').checked,
+        backgroundAlertSound: document.getElementById('backgroundAlertSound') ? document.getElementById('backgroundAlertSound').checked : true
     };
     
     // Update global reference
@@ -149,7 +159,8 @@ function resetSettings() {
             humidityMax: 80,
             airMax: 600,
             alertSound: 'default',
-            heartbeatSound: true
+            heartbeatSound: true,
+            backgroundAlertSound: true
         };
         // Update global reference
         window.thresholds = thresholds;
@@ -161,34 +172,49 @@ function resetSettings() {
 
 // ========== ALERT SOUNDS ==========
 const alertSounds = {
+    // Default Beep: Classic two-tone alert (beep-beep)
     default: function(audioContext) {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.frequency.value = 900;
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.3);
+        console.log('🔊 Playing: Default Beep');
         
+        // First beep - higher pitch
+        const osc1 = audioContext.createOscillator();
+        const gain1 = audioContext.createGain();
+        osc1.connect(gain1);
+        gain1.connect(audioContext.destination);
+        osc1.frequency.value = 880;  // A5 note
+        osc1.type = 'sine';
+        gain1.gain.setValueAtTime(0.4, audioContext.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+        osc1.start(audioContext.currentTime);
+        osc1.stop(audioContext.currentTime + 0.15);
+        
+        // Second beep - same pitch, slightly delayed
         setTimeout(() => {
             const osc2 = audioContext.createOscillator();
             const gain2 = audioContext.createGain();
             osc2.connect(gain2);
             gain2.connect(audioContext.destination);
-            osc2.frequency.value = 700;
+            osc2.frequency.value = 880;  // Same pitch
             osc2.type = 'sine';
-            gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            gain2.gain.setValueAtTime(0.4, audioContext.currentTime);
+            gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
             osc2.start(audioContext.currentTime);
-            osc2.stop(audioContext.currentTime + 0.3);
-        }, 200);
+            osc2.stop(audioContext.currentTime + 0.15);
+        }, 150);
     },
     
+    // Chime: Pleasant ascending musical notes (do-mi-sol)
     chime: function(audioContext) {
-        [523.25, 659.25, 783.99].forEach((freq, i) => {
+        console.log('🔔 Playing: Chime');
+        
+        // C-E-G major chord arpeggio (pleasant, musical)
+        const notes = [
+            523.25,  // C5 (do)
+            659.25,  // E5 (mi)
+            783.99   // G5 (sol)
+        ];
+        
+        notes.forEach((freq, i) => {
             setTimeout(() => {
                 const osc = audioContext.createOscillator();
                 const gain = audioContext.createGain();
@@ -196,40 +222,76 @@ const alertSounds = {
                 gain.connect(audioContext.destination);
                 osc.frequency.value = freq;
                 osc.type = 'sine';
-                gain.gain.setValueAtTime(0.2, audioContext.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                // Smooth attack and decay
+                gain.gain.setValueAtTime(0, audioContext.currentTime);
+                gain.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6);
+                
                 osc.start(audioContext.currentTime);
-                osc.stop(audioContext.currentTime + 0.5);
-            }, i * 100);
+                osc.stop(audioContext.currentTime + 0.6);
+            }, i * 150);  // 150ms between notes
         });
     },
     
+    // Bell: Single resonant bell tone with harmonics
     bell: function(audioContext) {
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-        osc.frequency.value = 800;
-        osc.type = 'triangle';
-        gain.gain.setValueAtTime(0.4, audioContext.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
-        osc.start(audioContext.currentTime);
-        osc.stop(audioContext.currentTime + 1);
+        console.log('🔔 Playing: Bell');
+        
+        // Create bell-like sound with multiple harmonics
+        const fundamental = 800;  // Base frequency
+        const harmonics = [1, 2, 3, 4.2, 5.4];  // Bell-like harmonic ratios
+        const volumes = [1.0, 0.5, 0.3, 0.2, 0.1];  // Decreasing volumes
+        
+        harmonics.forEach((ratio, i) => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.frequency.value = fundamental * ratio;
+            osc.type = 'sine';
+            
+            // Bell envelope: quick attack, long decay
+            const volume = 0.3 * volumes[i];
+            gain.gain.setValueAtTime(volume, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.5);
+            
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + 1.5);
+        });
     },
     
+    // Siren: Urgent alternating pitch (wee-woo-wee-woo)
     siren: function(audioContext) {
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(400, audioContext.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.5);
-        osc.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 1);
-        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
-        osc.start(audioContext.currentTime);
-        osc.stop(audioContext.currentTime + 1);
+        console.log('🚨 Playing: Siren (Urgent)');
+        
+        // Create urgent siren effect with multiple cycles
+        const cycles = 3;  // Number of wee-woo cycles
+        
+        for (let cycle = 0; cycle < cycles; cycle++) {
+            setTimeout(() => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                
+                osc.type = 'sawtooth';  // Harsh, urgent sound
+                
+                // Sweep from low to high (wee-woo)
+                osc.frequency.setValueAtTime(600, audioContext.currentTime);
+                osc.frequency.linearRampToValueAtTime(900, audioContext.currentTime + 0.2);
+                osc.frequency.linearRampToValueAtTime(600, audioContext.currentTime + 0.4);
+                
+                // Volume envelope
+                gain.gain.setValueAtTime(0.4, audioContext.currentTime);
+                gain.gain.setValueAtTime(0.4, audioContext.currentTime + 0.4);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.45);
+                
+                osc.start(audioContext.currentTime);
+                osc.stop(audioContext.currentTime + 0.45);
+            }, cycle * 500);  // 500ms between cycles
+        }
     }
 };
 
@@ -416,22 +478,126 @@ window.debugHeartbeat = function() {
     console.log('AudioContext state:', globalAudioContext ? globalAudioContext.state : 'not created');
 };
 
+// ========== BACKGROUND ALERT SOUNDS ==========
+function startBackgroundAlertSound(metricType) {
+    // Check if background alert sounds are enabled
+    const currentThresholds = window.thresholds || thresholds;
+    if (!currentThresholds.backgroundAlertSound) {
+        console.log('Background alert sounds disabled in settings');
+        return;
+    }
+    
+    const soundType = currentThresholds.alertSound || 'default';
+    
+    // Stop any existing alert for this metric
+    stopBackgroundAlertSound(metricType);
+    
+    console.log(`🔊 Starting background alert sound for ${metricType}: ${soundType}`);
+    
+    // Mark this metric as having an active alert
+    activeAlerts[metricType] = true;
+    
+    // Determine interval based on sound type
+    let interval;
+    switch(soundType) {
+        case 'siren':
+            interval = 2000; // Siren is 1.5s, play every 2s
+            break;
+        case 'bell':
+            interval = 3000; // Bell is 1.5s, play every 3s (less frequent)
+            break;
+        case 'chime':
+            interval = 2000; // Chime is 0.9s, play every 2s
+            break;
+        case 'default':
+        default:
+            interval = 3000; // Default is 0.3s, play every 3s
+            break;
+    }
+    
+    // Play immediately
+    playCustomAlertSound();
+    
+    // Then play repeatedly
+    backgroundAlertIntervals[metricType] = setInterval(() => {
+        if (activeAlerts[metricType]) {
+            console.log(`🔊 Playing background alert for ${metricType}`);
+            playCustomAlertSound();
+        }
+    }, interval);
+}
+
+function stopBackgroundAlertSound(metricType) {
+    if (backgroundAlertIntervals[metricType]) {
+        console.log(`🔇 Stopping background alert sound for ${metricType}`);
+        clearInterval(backgroundAlertIntervals[metricType]);
+        delete backgroundAlertIntervals[metricType];
+        delete activeAlerts[metricType];
+    }
+}
+
+function stopAllBackgroundAlertSounds() {
+    console.log('🔇 Stopping all background alert sounds');
+    Object.keys(backgroundAlertIntervals).forEach(metricType => {
+        stopBackgroundAlertSound(metricType);
+    });
+}
+
+// Cleanup background alert sounds when page is closed
+window.addEventListener('beforeunload', () => {
+    stopAllBackgroundAlertSounds();
+});
+
 function playCustomAlertSound() {
     try {
         const audioContext = getAudioContext();
         const soundType = thresholds.alertSound || 'default';
         
+        console.log('🔊 Playing alert sound:', soundType);
+        console.log('Available sounds:', Object.keys(alertSounds));
+        
         if (alertSounds[soundType]) {
             alertSounds[soundType](audioContext);
+        } else {
+            console.error('Sound type not found:', soundType);
+            // Fallback to default
+            alertSounds['default'](audioContext);
         }
     } catch (error) {
-        console.log('Alert sound error:', error);
+        console.error('Alert sound error:', error);
     }
 }
 
 function testAlertSound() {
+    // Read directly from the dropdown (not from saved settings)
+    const dropdown = document.getElementById('alertSound');
+    const soundType = dropdown ? dropdown.value : (thresholds.alertSound || 'default');
+    
+    const soundNames = {
+        'default': 'Default Beep',
+        'chime': 'Chime',
+        'bell': 'Bell',
+        'siren': 'Siren (Urgent)'
+    };
+    
+    console.log('🔊 Testing sound:', soundType);
+    console.log('Dropdown value:', dropdown ? dropdown.value : 'not found');
+    
+    showToast(`🔊 Playing: ${soundNames[soundType]}`, 'info');
+    
+    // Temporarily update thresholds for this test
+    const originalSound = thresholds.alertSound;
+    thresholds.alertSound = soundType;
+    window.thresholds = thresholds;
+    
+    // Play the sound
     playCustomAlertSound();
-    showToast('🔊 Playing selected alert sound', 'info');
+    
+    // Restore original (in case user doesn't save)
+    setTimeout(() => {
+        thresholds.alertSound = originalSound;
+        window.thresholds = thresholds;
+    }, 100);
 }
 
 // ========== DATA EXPORT ==========

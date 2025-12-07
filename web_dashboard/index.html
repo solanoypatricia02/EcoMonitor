@@ -1284,12 +1284,12 @@
                 <div class="logo-subtitle">Environmental Monitoring Dashboard</div>
             </div>
 
-            <div class="status-section">
+            <div class="status-section" id="connectionStatus">
                 <div class="status-row">
-                    <div class="status-dot"></div>
-                    <div class="status-text">Connected</div>
+                    <div class="status-dot" id="statusDot"></div>
+                    <div class="status-text" id="statusText">Connecting...</div>
                 </div>
-                <div class="status-time" id="updateTime">Updated 23:32:30</div>
+                <div class="status-time" id="updateTime">Waiting for data...</div>
             </div>
 
             <div class="info-grid">
@@ -1465,6 +1465,17 @@
                 Enable heartbeat sound with visual animations
             </label>
             <button onclick="testHeartbeatSound()" class="btn-test">💓 Test Heartbeat</button>
+        </div>
+        
+        <div class="settings-section">
+            <h4>🔊 Background Alert Sound</h4>
+            <label>
+                <input type="checkbox" id="backgroundAlertSound" checked>
+                Play selected alert sound continuously when thresholds are exceeded
+            </label>
+            <p style="font-size: 12px; color: #64748b; margin-top: 8px;">
+                When enabled, your chosen alert sound will play repeatedly in the background while any metric exceeds its threshold.
+            </p>
         </div>
         
         <div class="settings-actions">
@@ -1696,6 +1707,30 @@
             updateCardAnimation('humidity', humidityStatus);
             updateCardAnimation('air', airStatus);
 
+            // Start/stop background alert sounds based on threshold violations
+            if (typeof startBackgroundAlertSound === 'function') {
+                // Temperature
+                if (tempStatus !== 'good') {
+                    startBackgroundAlertSound('temperature');
+                } else {
+                    stopBackgroundAlertSound('temperature');
+                }
+                
+                // Humidity
+                if (humidityStatus !== 'good') {
+                    startBackgroundAlertSound('humidity');
+                } else {
+                    stopBackgroundAlertSound('humidity');
+                }
+                
+                // Air Quality
+                if (airStatus !== 'good') {
+                    startBackgroundAlertSound('airQuality');
+                } else {
+                    stopBackgroundAlertSound('airQuality');
+                }
+            }
+
             // Check for anomalies - will show popup every time value changes
             if (tempStatus !== 'good') {
                 addAlert('Temperature Anomaly', 
@@ -1765,55 +1800,9 @@
             }
         }
 
-        // Sound generation functions
-        function playAlertSound(type = 'warning') {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            if (type === 'critical') {
-                // Critical: Three ascending beeps
-                const frequencies = [800, 1000, 1200];
-                frequencies.forEach((freq, i) => {
-                    setTimeout(() => {
-                        const osc = audioContext.createOscillator();
-                        const gain = audioContext.createGain();
-                        osc.connect(gain);
-                        gain.connect(audioContext.destination);
-                        osc.frequency.value = freq;
-                        osc.type = 'sine';
-                        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-                        osc.start(audioContext.currentTime);
-                        osc.stop(audioContext.currentTime + 0.2);
-                    }, i * 150);
-                });
-            } else {
-                // Warning: Two tone beep
-                oscillator.frequency.value = 900;
-                oscillator.type = 'sine';
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.3);
-                
-                setTimeout(() => {
-                    const osc2 = audioContext.createOscillator();
-                    const gain2 = audioContext.createGain();
-                    osc2.connect(gain2);
-                    gain2.connect(audioContext.destination);
-                    osc2.frequency.value = 700;
-                    osc2.type = 'sine';
-                    gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-                    osc2.start(audioContext.currentTime);
-                    osc2.stop(audioContext.currentTime + 0.3);
-                }, 200);
-            }
-        }
+        // Sound generation functions - REMOVED
+        // Now using playCustomAlertSound() from features.js
+        // This ensures all alert sounds use the customizable sound system
 
         function showAlertPopup(title, desc, data, severity = 'warning') {
             const container = document.getElementById('alertPopupContainer');
@@ -1845,11 +1834,11 @@
             
             container.appendChild(popup);
             
-            // Play sound (uses custom sound from settings)
+            // Play sound (uses custom sound from settings in features.js)
             if (typeof playCustomAlertSound === 'function') {
                 playCustomAlertSound();
             } else {
-                playAlertSound(severity);
+                console.warn('playCustomAlertSound not available - features.js not loaded?');
             }
             
             // Auto remove after 5 seconds
@@ -1967,11 +1956,102 @@
             document.getElementById('aiExplanation').textContent = explanation;
         };
 
+        // Data timeout tracking
+        let lastDataTimestamp = null;
+        let dataTimeoutChecker = null;
+        const DATA_TIMEOUT_MS = 30000; // 30 seconds - if no new data, show "No Data"
+
+        function clearDashboard() {
+            console.log('⚠️ No data received - clearing dashboard');
+            
+            // Update connection status
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            if (statusDot) {
+                statusDot.style.background = '#ef4444';
+                statusDot.style.animation = 'none';
+            }
+            if (statusText) {
+                statusText.textContent = 'Disconnected';
+                statusText.style.color = '#ef4444';
+            }
+            
+            // Clear metric values
+            document.getElementById('tempValue').textContent = '--';
+            document.getElementById('humidityValue').textContent = '--';
+            document.getElementById('airValue').textContent = '--';
+            
+            // Set all statuses to disconnected
+            const statusElements = ['tempStatus', 'humidityStatus', 'airStatus'];
+            statusElements.forEach(id => {
+                const el = document.getElementById(id);
+                el.className = 'metric-status';
+                el.innerHTML = '<span style="color: #94a3b8;">⚠️ No Data</span>';
+            });
+            
+            // Remove heartbeat animations
+            document.querySelectorAll('.metric-card').forEach(card => {
+                card.classList.remove('warning', 'critical', 'good');
+            });
+            
+            // Stop all alert sounds
+            if (typeof stopAllBackgroundAlertSounds === 'function') {
+                stopAllBackgroundAlertSounds();
+            }
+            if (typeof stopAllHeartbeatSounds === 'function') {
+                stopAllHeartbeatSounds();
+            }
+            
+            // Update info panel
+            document.getElementById('dataPoints').textContent = '--';
+            document.getElementById('avgTemp').textContent = '--';
+            document.getElementById('avgHumidity').textContent = '--';
+            document.getElementById('updateTime').textContent = '⚠️ No data received';
+        }
+
+        function checkDataTimeout() {
+            if (!lastDataTimestamp) return;
+            
+            const now = Date.now();
+            const timeSinceLastData = now - lastDataTimestamp;
+            
+            if (timeSinceLastData > DATA_TIMEOUT_MS) {
+                clearDashboard();
+            }
+        }
+
         function updateDashboard(data) {
             const entries = Object.values(data);
             allDataHistory = entries; // Store for export and predictions
             const latest = entries[entries.length - 1];
             const recent = entries.slice(-50);
+
+            // Check if data is recent (within last 30 seconds)
+            const latestTimestamp = new Date(latest.timestamp).getTime();
+            const now = Date.now();
+            const dataAge = now - latestTimestamp;
+            
+            // Update last data timestamp
+            lastDataTimestamp = now;
+            
+            // If data is too old (more than 30 seconds), show warning
+            if (dataAge > DATA_TIMEOUT_MS) {
+                console.log(`⚠️ Data is ${Math.round(dataAge/1000)}s old`);
+                clearDashboard();
+                return;
+            }
+
+            // Update connection status to connected
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            if (statusDot) {
+                statusDot.style.background = '#10b981';
+                statusDot.style.animation = 'pulse 2s infinite';
+            }
+            if (statusText) {
+                statusText.textContent = 'Connected';
+                statusText.style.color = '#065f46';
+            }
 
             updateMetrics(latest);
 
@@ -1981,7 +2061,17 @@
             const avgHumidity = (recent.reduce((sum, e) => sum + e.humidity, 0) / recent.length).toFixed(1);
             document.getElementById('avgTemp').textContent = avgTemp + '°C';
             document.getElementById('avgHumidity').textContent = avgHumidity + '%';
-            document.getElementById('updateTime').textContent = 'Updated ' + new Date(latest.timestamp).toLocaleTimeString();
+            
+            // Show data age if more than 10 seconds old
+            const updateTimeEl = document.getElementById('updateTime');
+            if (dataAge > 10000) {
+                const secondsAgo = Math.round(dataAge / 1000);
+                updateTimeEl.textContent = `⚠️ Updated ${secondsAgo}s ago`;
+                updateTimeEl.style.color = '#f59e0b';
+            } else {
+                updateTimeEl.textContent = 'Updated ' + new Date(latest.timestamp).toLocaleTimeString();
+                updateTimeEl.style.color = '';
+            }
 
             // Update chart
             const labels = recent.map(e => new Date(e.timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}));
@@ -1998,8 +2088,19 @@
 
         onValue(recentQuery, (snapshot) => {
             const data = snapshot.val();
-            if (data) updateDashboard(data);
+            if (data) {
+                updateDashboard(data);
+            } else {
+                // No data in Firebase at all
+                clearDashboard();
+            }
         });
+
+        // Start periodic timeout checker (every 5 seconds)
+        dataTimeoutChecker = setInterval(checkDataTimeout, 5000);
+        
+        // Initial state
+        clearDashboard();
 
         // Close modal on overlay click
         document.getElementById('anomalyModal').addEventListener('click', function(e) {
@@ -2124,6 +2225,6 @@
     </script>
 
     <!-- Enhanced Features Script -->
-    <script src="features.js"></script>
+    <script src="features.js?v=7.0"></script>
 </body>
 </html>

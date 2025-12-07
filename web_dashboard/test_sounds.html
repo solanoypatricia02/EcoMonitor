@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert Sounds Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .sound-button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .sound-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .sound-button:active {
+            transform: translateY(0);
+        }
+        .default { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .chime { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .bell { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .siren { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
+        .info {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔊 Alert Sounds Test</h1>
+    
+    <div class="status" id="status">Click any button to test sounds</div>
+    
+    <button class="sound-button default" onclick="playSound('default')">
+        🔔 Default Beep
+        <br><small>Two identical beeps (beep-beep)</small>
+    </button>
+    
+    <button class="sound-button chime" onclick="playSound('chime')">
+        🎵 Chime
+        <br><small>Musical ascending notes (do-mi-sol)</small>
+    </button>
+    
+    <button class="sound-button bell" onclick="playSound('bell')">
+        🔔 Bell
+        <br><small>Resonant bell with harmonics</small>
+    </button>
+    
+    <button class="sound-button siren" onclick="playSound('siren')">
+        🚨 Siren (Urgent)
+        <br><small>Alternating pitch (wee-woo x3)</small>
+    </button>
+    
+    <div class="info">
+        <h3>ℹ️ Instructions</h3>
+        <p><strong>1.</strong> Click each button to hear the sound</p>
+        <p><strong>2.</strong> Each sound should be distinctly different</p>
+        <p><strong>3.</strong> If all sounds are the same, check browser console (F12)</p>
+        <p><strong>4.</strong> Make sure your volume is turned up</p>
+    </div>
+    
+    <div class="info">
+        <h3>🎯 What to Listen For</h3>
+        <p><strong>Default:</strong> Quick beep-beep (0.3 seconds)</p>
+        <p><strong>Chime:</strong> Three musical notes going up (0.9 seconds)</p>
+        <p><strong>Bell:</strong> Single DONG with long ring (1.5 seconds)</p>
+        <p><strong>Siren:</strong> Wee-woo-wee-woo-wee-woo (1.5 seconds)</p>
+    </div>
+
+    <script>
+        let audioContext = null;
+        
+        function getAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            return audioContext;
+        }
+        
+        const alertSounds = {
+            default: function(ctx) {
+                console.log('🔊 Playing: Default Beep');
+                document.getElementById('status').textContent = '🔊 Playing: Default Beep (beep-beep)';
+                
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.frequency.value = 880;
+                osc1.type = 'sine';
+                gain1.gain.setValueAtTime(0.4, ctx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                osc1.start(ctx.currentTime);
+                osc1.stop(ctx.currentTime + 0.15);
+                
+                setTimeout(() => {
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.frequency.value = 880;
+                    osc2.type = 'sine';
+                    gain2.gain.setValueAtTime(0.4, ctx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    osc2.start(ctx.currentTime);
+                    osc2.stop(ctx.currentTime + 0.15);
+                }, 150);
+            },
+            
+            chime: function(ctx) {
+                console.log('🔔 Playing: Chime');
+                document.getElementById('status').textContent = '🔔 Playing: Chime (do-mi-sol)';
+                
+                const notes = [523.25, 659.25, 783.99];
+                notes.forEach((freq, i) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.frequency.value = freq;
+                        osc.type = 'sine';
+                        gain.gain.setValueAtTime(0, ctx.currentTime);
+                        gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+                        osc.start(ctx.currentTime);
+                        osc.stop(ctx.currentTime + 0.6);
+                    }, i * 150);
+                });
+            },
+            
+            bell: function(ctx) {
+                console.log('🔔 Playing: Bell');
+                document.getElementById('status').textContent = '🔔 Playing: Bell (DONG~~~~~)';
+                
+                const fundamental = 800;
+                const harmonics = [1, 2, 3, 4.2, 5.4];
+                const volumes = [1.0, 0.5, 0.3, 0.2, 0.1];
+                
+                harmonics.forEach((ratio, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = fundamental * ratio;
+                    osc.type = 'sine';
+                    const volume = 0.3 * volumes[i];
+                    gain.gain.setValueAtTime(volume, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 1.5);
+                });
+            },
+            
+            siren: function(ctx) {
+                console.log('🚨 Playing: Siren');
+                document.getElementById('status').textContent = '🚨 Playing: Siren (wee-woo-wee-woo-wee-woo)';
+                
+                const cycles = 3;
+                for (let cycle = 0; cycle < cycles; cycle++) {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(600, ctx.currentTime);
+                        osc.frequency.linearRampToValueAtTime(900, ctx.currentTime + 0.2);
+                        osc.frequency.linearRampToValueAtTime(600, ctx.currentTime + 0.4);
+                        gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                        gain.gain.setValueAtTime(0.4, ctx.currentTime + 0.4);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.45);
+                        osc.start(ctx.currentTime);
+                        osc.stop(ctx.currentTime + 0.45);
+                    }, cycle * 500);
+                }
+            }
+        };
+        
+        function playSound(type) {
+            try {
+                const ctx = getAudioContext();
+                console.log('Playing sound type:', type);
+                alertSounds[type](ctx);
+                
+                setTimeout(() => {
+                    document.getElementById('status').textContent = 'Click any button to test sounds';
+                }, 2000);
+            } catch (error) {
+                console.error('Error playing sound:', error);
+                document.getElementById('status').textContent = '❌ Error: ' + error.message;
+            }
+        }
+        
+        console.log('🎵 Sound test page loaded');
+        console.log('Available sounds:', Object.keys(alertSounds));
+    </script>
+</body>
+</html>
