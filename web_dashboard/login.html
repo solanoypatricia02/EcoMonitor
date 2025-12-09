@@ -13,22 +13,106 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0f172a;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 20px 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #10b981;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-logo:hover {
+            opacity: 0.8;
+        }
+
+        .nav-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .back-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-link:hover {
+            color: #10b981;
         }
 
         .login-container {
-            background: white;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             max-width: 400px;
             width: 100%;
             animation: slideUp 0.5s ease;
+            position: relative;
+            z-index: 1;
+            margin-top: 80px;
         }
 
         @keyframes slideUp {
@@ -43,7 +127,8 @@
         }
 
         .login-header {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: rgba(15, 23, 42, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 40px 30px;
             text-align: center;
             color: white;
@@ -52,24 +137,25 @@
         .logo {
             width: 80px;
             height: 80px;
-            background: white;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border-radius: 20px;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
         }
 
         .login-header h1 {
             font-size: 28px;
             margin-bottom: 8px;
+            color: #f1f5f9;
         }
 
         .login-header p {
             font-size: 14px;
-            opacity: 0.9;
+            color: #94a3b8;
         }
 
         .login-body {
@@ -84,24 +170,31 @@
             display: block;
             font-size: 14px;
             font-weight: 600;
-            color: #374151;
+            color: #e2e8f0;
             margin-bottom: 8px;
         }
 
         input {
             width: 100%;
             padding: 14px 16px;
-            border: 2px solid #e5e7eb;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             font-size: 15px;
+            color: #f1f5f9;
             transition: all 0.3s;
             font-family: inherit;
         }
 
+        input::placeholder {
+            color: #64748b;
+        }
+
         input:focus {
             outline: none;
+            background: rgba(15, 23, 42, 0.7);
             border-color: #10b981;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
         }
 
         .btn-login {
@@ -128,13 +221,14 @@
         }
 
         .error-message {
-            background: #fee2e2;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
             font-size: 14px;
             display: none;
+            border: 1px solid rgba(239, 68, 68, 0.3);
             border-left: 4px solid #ef4444;
         }
 
@@ -164,20 +258,41 @@
             margin: 0;
             font-weight: 400;
             font-size: 14px;
-            color: #6b7280;
+            color: #94a3b8;
         }
 
         .login-footer {
             text-align: center;
             padding: 20px;
-            background: #f9fafb;
+            background: rgba(15, 23, 42, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 13px;
-            color: #6b7280;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 20px;
+            }
+
+            .nav-logo {
+                font-size: 18px;
+            }
+
+            .nav-logo-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 18px;
+            }
+
+            .back-link {
+                font-size: 13px;
+            }
         }
 
         @media (max-width: 480px) {
             .login-container {
-                margin: 0;
+                margin-top: 80px;
             }
 
             .login-header {
@@ -191,6 +306,19 @@
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">🌍</div>
+                <span>EcoMonitor</span>
+            </a>
+            <a href="index.html" class="back-link">
+                ← Back to Home
+            </a>
+        </div>
+    </nav>
+
     <div class="login-container">
         <div class="login-header">
             <div class="logo">🌍</div>
@@ -253,7 +381,7 @@
             const rememberMe = localStorage.getItem('ecomonitor_remember');
             
             if (isLoggedIn === 'true' || rememberMe === 'true') {
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             }
         });
 
@@ -277,7 +405,7 @@
                 }
 
                 // Redirect to dashboard
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             } else {
                 // Failed login
                 errorMessage.classList.add('show');

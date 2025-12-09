@@ -852,42 +852,99 @@ body.dark-mode .btn-dismiss {
 }
 
 
-/* ========== LOGOUT BUTTON ========== */
-.logout-button {
-    position: fixed;
-    top: 140px;
-    right: 30px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
+/* ========== SIDEBAR LOGOUT BUTTON ========== */
+.sidebar-logout {
+    margin-top: auto;
+    padding-top: 20px;
+}
+
+.sidebar-logout-btn {
+    width: 100%;
+    padding: 14px 20px;
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     border: none;
-    font-size: 24px;
+    border-radius: 12px;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    transition: all 0.3s ease;
-    z-index: 999;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-.logout-button:hover {
-    transform: translateY(-2px) scale(1.05);
+.sidebar-logout-btn:hover {
+    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
 }
 
-.logout-button:active {
-    transform: translateY(0) scale(0.95);
+.sidebar-logout-btn:active {
+    transform: translateY(0);
+}
+
+.logout-icon {
+    font-size: 20px;
+}
+
+.logout-text {
+    font-size: 15px;
+}
+
+/* User info badge */
+.user-info {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 998;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-info::before {
+    content: '👤';
+    font-size: 18px;
+}
+
+@media (max-width: 1024px) {
+    .sidebar-logout {
+        padding-top: 16px;
+    }
+
+    .sidebar-logout-btn {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
 }
 
 @media (max-width: 768px) {
-    .logout-button {
-        top: auto;
-        bottom: 90px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
+    .sidebar-logout {
+        padding-top: 12px;
+    }
+
+    .user-info {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar-logout-btn {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .logout-icon {
+        font-size: 18px;
     }
 }
