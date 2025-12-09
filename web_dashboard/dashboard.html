@@ -1643,6 +1643,16 @@
         <button onclick="toggleDarkMode()" class="dark-mode-toggle" title="Toggle Dark Mode">
             <span id="darkModeIcon">🌙</span>
         </button>
+
+        <!-- Mobile Logout Button (hidden on desktop) -->
+        <button onclick="logout()" class="mobile-logout-btn" title="Sign Out" style="display: none;">
+            →
+        </button>
+
+        <!-- User Info Badge -->
+        <div class="user-info" id="userInfo">
+            <span id="userEmail">Admin</span>
+        </div>
     </div>
 
     <script>
