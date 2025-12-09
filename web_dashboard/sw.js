@@ -1,8 +1,15 @@
 // Service Worker for PWA functionality
-const CACHE_NAME = 'envitrack-v1';
+const CACHE_NAME = 'ecomonitor-v2';
 const urlsToCache = [
+  '/',
   '/index.html',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
+  '/login.html',
+  '/dashboard.html',
+  '/manifest.json',
+  '/enhanced-styles.css',
+  '/premium-dashboard.css',
+  '/features.js',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
   'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 

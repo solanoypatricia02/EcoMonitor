@@ -1,26 +1,28 @@
 {
-  "name": "EcoMonitor - Environmental Monitoring Systems",
+  "name": "EcoMonitor - Environmental Monitoring System",
   "short_name": "EcoMonitor",
   "description": "Real-time environmental monitoring system with AI-powered insights",
-  "start_url": "/index.html",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f0f4f8",
+  "background_color": "#0f172a",
   "theme_color": "#10b981",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "../images/logo.png",
+      "src": "/images/logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "../images/logo.png",
+      "src": "/images/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
   "categories": ["utilities", "productivity"],
-  "screenshots": []
+  "screenshots": [],
+  "prefer_related_applications": false
 }

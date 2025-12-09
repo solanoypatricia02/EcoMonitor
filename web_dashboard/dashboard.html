@@ -58,6 +58,13 @@
             height: 100vh;
         }
 
+        /* Mobile viewport optimization */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                height: -webkit-fill-available;
+            }
+        }
+
         .dashboard {
             display: grid;
             grid-template-columns: 280px 1fr;
@@ -1039,101 +1046,173 @@
         @media (max-width: 768px) {
             body {
                 overflow-y: auto;
+                height: auto;
+                min-height: 100vh;
             }
 
             .dashboard {
                 display: flex;
                 flex-direction: column;
+                height: auto;
+                min-height: 100vh;
             }
 
+            /* Ultra-Compact Sidebar */
             .sidebar-left {
-                padding: 16px;
+                padding: 10px;
+                border-bottom: 1px solid #e2e8f0;
+                height: auto;
+                overflow-y: visible;
+            }
+
+            .logo-section {
+                margin-bottom: 8px;
             }
 
             .logo {
-                gap: 10px;
+                gap: 8px;
             }
 
             .logo-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 24px;
+                width: 32px;
+                height: 32px;
+                font-size: 18px;
             }
 
             .logo-text {
-                font-size: 20px;
-            }
-
-            .logo-subtitle {
-                font-size: 11px;
-                margin-left: 50px;
-            }
-
-            .info-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-            }
-
-            .info-item {
-                padding: 12px;
-            }
-
-            .info-label {
-                font-size: 10px;
-            }
-
-            .info-value {
-                font-size: 18px;
-            }
-
-            .main-content {
-                padding: 16px;
-            }
-
-            .header h1 {
-                font-size: 22px;
-            }
-
-            .header p {
-                font-size: 13px;
-            }
-
-            .metrics-grid {
-                grid-template-columns: 1fr;
-                gap: 14px;
-                margin-bottom: 20px;
-            }
-
-            .metric-card {
-                padding: 20px;
-            }
-
-            .metric-icon {
-                width: 48px;
-                height: 48px;
-                font-size: 24px;
-            }
-
-            .metric-value {
-                font-size: 42px;
-            }
-
-            .metric-unit {
-                font-size: 18px;
-            }
-
-            .chart-section {
-                height: 350px;
-                padding: 20px;
-                margin-bottom: 20px;
-            }
-
-            .chart-title {
                 font-size: 16px;
             }
 
+            .logo-subtitle {
+                display: none;
+            }
+
+            .status-section {
+                padding: 8px 10px;
+                margin-bottom: 8px;
+            }
+
+            .status-row {
+                margin-bottom: 4px;
+            }
+
+            .status-text {
+                font-size: 11px;
+            }
+
+            .status-time {
+                font-size: 10px;
+            }
+
+            /* Horizontal scrolling info cards */
+            .info-grid {
+                display: flex;
+                gap: 6px;
+                overflow-x: auto;
+                padding-bottom: 4px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .info-grid::-webkit-scrollbar {
+                display: none;
+            }
+
+            .info-item {
+                min-width: 85px;
+                padding: 8px 10px;
+                flex-shrink: 0;
+            }
+
+            .info-label {
+                font-size: 8px;
+                margin-bottom: 3px;
+            }
+
+            .info-value {
+                font-size: 14px;
+            }
+
+            .sidebar-logout {
+                display: none;
+            }
+
+            /* Compact Main Content */
+            .main-content {
+                padding: 10px;
+                padding-bottom: 70px; /* Space for bottom action bar */
+                overflow-y: visible;
+            }
+
+            .header {
+                margin-bottom: 10px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+                margin-bottom: 3px;
+            }
+
+            .header p {
+                font-size: 11px;
+            }
+
+            /* Compact Metric Cards */
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .metric-card {
+                padding: 12px;
+            }
+
+            .metric-header {
+                margin-bottom: 8px;
+            }
+
+            .metric-label {
+                font-size: 11px;
+            }
+
+            .metric-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+
+            .metric-value {
+                font-size: 32px;
+                margin-bottom: 6px;
+            }
+
+            .metric-unit {
+                font-size: 14px;
+            }
+
+            .metric-status {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
+
+            /* Compact Chart */
+            .chart-section {
+                height: 250px;
+                padding: 12px;
+                margin-bottom: 10px;
+            }
+
+            .chart-header {
+                margin-bottom: 10px;
+            }
+
+            .chart-title {
+                font-size: 14px;
+            }
+
             .chart-subtitle {
-                font-size: 12px;
+                font-size: 10px;
             }
 
 
@@ -1186,102 +1265,115 @@
         }
 
         @media (max-width: 480px) {
+            /* Ultra-compact for small phones */
             .sidebar-left {
-                padding: 12px;
+                padding: 10px;
             }
 
-            .status-section {
-                padding: 14px;
+            .logo-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 18px;
             }
 
-            .info-grid {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-
-            .info-item {
-                padding: 14px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .info-label {
-                font-size: 11px;
-                margin-bottom: 0;
-            }
-
-            .info-value {
-                font-size: 20px;
-            }
-
-            .main-content {
-                padding: 12px;
-            }
-
-            .header {
-                margin-bottom: 20px;
-            }
-
-            .header h1 {
-                font-size: 20px;
-            }
-
-            .header p {
-                font-size: 12px;
-            }
-
-            .metrics-grid {
-                gap: 12px;
-            }
-
-            .metric-card {
-                padding: 18px;
-            }
-
-            .metric-header {
-                margin-bottom: 12px;
-            }
-
-            .metric-label {
-                font-size: 12px;
-            }
-
-            .metric-icon {
-                width: 44px;
-                height: 44px;
-                font-size: 22px;
-            }
-
-            .metric-value {
-                font-size: 38px;
-                margin-bottom: 10px;
-            }
-
-            .metric-unit {
+            .logo-text {
                 font-size: 16px;
             }
 
-            .metric-status {
+            .status-section {
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+
+            .status-text {
                 font-size: 11px;
-                padding: 5px 10px;
+            }
+
+            .status-time {
+                font-size: 10px;
+            }
+
+            .info-item {
+                min-width: 90px;
+                padding: 8px 10px;
+            }
+
+            .info-label {
+                font-size: 8px;
+            }
+
+            .info-value {
+                font-size: 14px;
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+
+            .header {
+                margin-bottom: 12px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .header p {
+                font-size: 11px;
+            }
+
+            .metrics-grid {
+                gap: 8px;
+            }
+
+            .metric-card {
+                padding: 12px;
+            }
+
+            .metric-header {
+                margin-bottom: 8px;
+            }
+
+            .metric-label {
+                font-size: 11px;
+            }
+
+            .metric-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+
+            .metric-value {
+                font-size: 32px;
+                margin-bottom: 6px;
+            }
+
+            .metric-unit {
+                font-size: 14px;
+            }
+
+            .metric-status {
+                font-size: 10px;
+                padding: 4px 8px;
             }
 
             .chart-section {
-                height: 300px;
-                padding: 16px;
+                height: 250px;
+                padding: 12px;
+                margin-bottom: 12px;
             }
 
             .chart-header {
-                margin-bottom: 16px;
+                margin-bottom: 10px;
             }
 
             .chart-title {
-                font-size: 15px;
+                font-size: 14px;
             }
 
             .chart-subtitle {
-                font-size: 11px;
+                font-size: 10px;
             }
 
 
@@ -2342,7 +2434,7 @@
         // Register Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
+                navigator.serviceWorker.register('/sw.js')
                     .then(registration => {
                         console.log('✓ Service Worker registered successfully');
                         console.log('✓ PWA is ready - you can install this app!');
