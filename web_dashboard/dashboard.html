@@ -56,6 +56,8 @@
             color: #1e293b;
             overflow: hidden;
             height: 100vh;
+            margin: 0;
+            padding: 0;
         }
 
         /* Mobile viewport optimization */
@@ -65,11 +67,25 @@
             }
         }
 
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto !important;
+                overflow-x: hidden;
+            }
+        }
+
         .dashboard {
             display: grid;
             grid-template-columns: 280px 1fr;
             height: 100vh;
             gap: 0;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                height: auto !important;
+                min-height: 100vh;
+            }
         }
 
         /* Left Sidebar - Logo & Info */
@@ -952,42 +968,15 @@
         /* Mobile responsive for popups */
         @media (max-width: 768px) {
             .alert-popup-container {
-                top: 80px;
-                right: 16px;
-                left: 16px;
+                top: 10px;
+                right: 10px;
+                left: 10px;
                 max-width: none;
-            }
-
-            .alert-popup {
-                padding: 16px;
-            }
-
-            .alert-popup-icon {
-                font-size: 28px;
-            }
-
-            .alert-popup-title {
-                font-size: 15px;
-            }
-
-            .alert-popup-desc {
-                font-size: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .alert-popup-container {
-                top: 70px;
-                right: 12px;
-                left: 12px;
+                z-index: 999;
             }
 
             .alert-popup {
                 padding: 14px;
-            }
-
-            .alert-popup-header {
-                gap: 10px;
             }
 
             .alert-popup-icon {
@@ -996,6 +985,34 @@
 
             .alert-popup-title {
                 font-size: 14px;
+            }
+
+            .alert-popup-desc {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .alert-popup-container {
+                top: 8px;
+                right: 8px;
+                left: 8px;
+            }
+
+            .alert-popup {
+                padding: 12px;
+            }
+
+            .alert-popup-header {
+                gap: 8px;
+            }
+
+            .alert-popup-icon {
+                font-size: 22px;
+            }
+
+            .alert-popup-title {
+                font-size: 13px;
             }
 
             .alert-popup-desc {
@@ -1055,14 +1072,18 @@
                 flex-direction: column;
                 height: auto;
                 min-height: 100vh;
+                padding-top: 0;
             }
 
             /* Ultra-Compact Sidebar */
             .sidebar-left {
                 padding: 10px;
+                padding-top: 10px;
                 border-bottom: 1px solid #e2e8f0;
                 height: auto;
                 overflow-y: visible;
+                position: relative;
+                z-index: 1;
             }
 
             .logo-section {
@@ -1140,8 +1161,11 @@
             /* Compact Main Content */
             .main-content {
                 padding: 10px;
-                padding-bottom: 70px; /* Space for bottom action bar */
+                padding-bottom: 80px; /* Space for bottom action bar */
                 overflow-y: visible;
+                position: relative;
+                z-index: 1;
+                background: #f8fafb;
             }
 
             .header {
