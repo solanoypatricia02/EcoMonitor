@@ -1544,6 +1544,16 @@
 
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
+        
+        // Debug: Test Firebase connection
+        console.log('🚀 EcoMonitor Dashboard Starting...');
+        console.log('🔥 Firebase App initialized');
+        console.log('🌐 Database URL:', firebaseConfig.databaseURL);
+        
+        // Test direct URL access
+        console.log('🔍 Test Firebase access:');
+        console.log('   Open this URL in browser:', firebaseConfig.databaseURL + '/sensor_data.json');
+        console.log('   Should show your data or null');
         let mainChart = null;
         let alertsHistory = [];
         let currentAnomaly = null;
@@ -1959,7 +1969,11 @@
         // Data timeout tracking
         let lastDataTimestamp = null;
         let dataTimeoutChecker = null;
-        const DATA_TIMEOUT_MS = 30000; // 30 seconds - if no new data, show "No Data"
+        const DATA_TIMEOUT_MS = 60000; // 60 seconds - if no new data, show "No Data"
+        const MAX_DATA_AGE_MS = 300000; // 5 minutes - ignore data older than this
+        
+        // DEBUG MODE: Set to true to show data regardless of age
+        const DEBUG_IGNORE_TIMESTAMP = true; // ENABLED: Shows old data for testing
 
         function clearDashboard() {
             console.log('⚠️ No data received - clearing dashboard');
@@ -2026,20 +2040,44 @@
             const latest = entries[entries.length - 1];
             const recent = entries.slice(-50);
 
-            // Check if data is recent (within last 30 seconds)
+            // Check if data is recent
+            console.log('🕐 Checking data timestamp...');
+            console.log('   Latest entry timestamp:', latest.timestamp);
+            
             const latestTimestamp = new Date(latest.timestamp).getTime();
             const now = Date.now();
             const dataAge = now - latestTimestamp;
             
+            console.log('   Parsed timestamp:', new Date(latestTimestamp).toISOString());
+            console.log('   Current time:', new Date(now).toISOString());
+            console.log('   Data age:', Math.round(dataAge/1000), 'seconds');
+            
             // Update last data timestamp
             lastDataTimestamp = now;
             
-            // If data is too old (more than 30 seconds), show warning
-            if (dataAge > DATA_TIMEOUT_MS) {
-                console.log(`⚠️ Data is ${Math.round(dataAge/1000)}s old`);
+            // If data is extremely old (more than 5 minutes), ignore it and wait for fresh data
+            if (dataAge > MAX_DATA_AGE_MS && !DEBUG_IGNORE_TIMESTAMP) {
+                console.log(`⚠️ Data is ${Math.round(dataAge/1000)}s old (${Math.round(dataAge/60000)} minutes)`);
+                console.log('⏳ Waiting for fresh data from ESP32...');
+                console.log('💡 ESP32 should send new data every 10 seconds');
+                console.log('💡 Or delete old data from Firebase Console');
+                console.log('💡 Or set DEBUG_IGNORE_TIMESTAMP = true in code to bypass');
                 clearDashboard();
                 return;
             }
+            
+            if (DEBUG_IGNORE_TIMESTAMP && dataAge > MAX_DATA_AGE_MS) {
+                console.log('🐛 DEBUG MODE: Showing old data (timestamp check bypassed)');
+            }
+            
+            // If data age is negative (future timestamp), there's a clock sync issue
+            if (dataAge < 0) {
+                console.log('⚠️ WARNING: Data timestamp is in the future!');
+                console.log('   This means ESP32 clock is ahead of your computer');
+                console.log('   Accepting data anyway...');
+            }
+            
+            console.log(`✅ Data age: ${Math.round(dataAge/1000)}s (acceptable)`);
 
             // Update connection status to connected
             const statusDot = document.getElementById('statusDot');
@@ -2083,17 +2121,37 @@
         }
 
         // Listen for updates
+        console.log('🔥 Firebase initialized');
+        console.log('📍 Database URL:', firebaseConfig.databaseURL);
+        console.log('📊 Listening to: sensor_data');
+        
         const sensorRef = ref(database, 'sensor_data');
         const recentQuery = query(sensorRef, limitToLast(50));
 
         onValue(recentQuery, (snapshot) => {
+            console.log('📡 Firebase data received');
             const data = snapshot.val();
+            console.log('📦 Data:', data);
+            
             if (data) {
+                console.log('✅ Data exists, updating dashboard');
+                console.log('📈 Number of entries:', Object.keys(data).length);
                 updateDashboard(data);
             } else {
+                console.log('❌ No data in Firebase');
+                console.log('💡 Check:');
+                console.log('   1. Firebase database exists');
+                console.log('   2. Data is being written to sensor_data path');
+                console.log('   3. Firebase rules allow read access');
                 // No data in Firebase at all
                 clearDashboard();
             }
+        }, (error) => {
+            console.error('🔥 Firebase error:', error);
+            console.error('💡 Possible issues:');
+            console.error('   1. Wrong database URL');
+            console.error('   2. Firebase rules deny read access');
+            console.error('   3. Network/CORS issue');
         });
 
         // Start periodic timeout checker (every 5 seconds)
