@@ -262,6 +262,11 @@ bool sendToFirebase(float temp, float humidity, float airQuality) {
   String jsonPayload;
   serializeJson(doc, jsonPayload);
   
+  // Debug: Print what we're sending
+  Serial.println("📤 Sending to Firebase:");
+  Serial.println("   URL: " + path);
+  Serial.println("   Payload: " + jsonPayload);
+  
   // Send POST request
   http.begin(path);
   http.addHeader("Content-Type", "application/json");
@@ -270,12 +275,21 @@ bool sendToFirebase(float temp, float humidity, float airQuality) {
   
   bool success = false;
   if (httpResponseCode > 0) {
+    String response = http.getString();
     if (httpResponseCode == 200) {
       success = true;
       Serial.printf("HTTP Response: %d\n", httpResponseCode);
+      Serial.println("📥 Firebase Response: " + response);
+      
+      // Check if response contains a key (successful write)
+      if (response.indexOf("name") > 0) {
+        Serial.println("✅ Data successfully written to Firebase!");
+      } else {
+        Serial.println("⚠️ WARNING: Got 200 but no key in response");
+        Serial.println("   This might mean data wasn't saved");
+      }
     } else {
       Serial.printf("HTTP Error: %d\n", httpResponseCode);
-      String response = http.getString();
       Serial.println("Response: " + response);
     }
   } else {

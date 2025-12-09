@@ -12,6 +12,32 @@
     <link rel="stylesheet" href="enhanced-styles.css">
     <link rel="manifest" href="manifest.json">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Authentication Check -->
+    <script>
+        // Check if user is logged in
+        window.addEventListener('load', () => {
+            const isLoggedIn = sessionStorage.getItem('ecomonitor_logged_in');
+            const rememberMe = localStorage.getItem('ecomonitor_remember');
+            
+            if (isLoggedIn !== 'true' && rememberMe !== 'true') {
+                // Not logged in, redirect to login page
+                window.location.href = 'login.html';
+            }
+        });
+        
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.removeItem('ecomonitor_logged_in');
+                sessionStorage.removeItem('ecomonitor_user');
+                localStorage.removeItem('ecomonitor_remember');
+                localStorage.removeItem('ecomonitor_user');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -1392,6 +1418,11 @@
     <!-- Settings Button -->
     <button onclick="openSettings()" class="settings-button" title="Settings">
         ⚙️
+    </button>
+
+    <!-- Logout Button -->
+    <button onclick="logout()" class="logout-button" title="Logout">
+        🚪
     </button>
 
     <!-- Export Buttons -->
