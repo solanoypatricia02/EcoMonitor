@@ -385,7 +385,13 @@
             const isLoggedIn = sessionStorage.getItem('ecomonitor_logged_in');
             const rememberMe = localStorage.getItem('ecomonitor_remember');
             
-            if (isLoggedIn === 'true' || rememberMe === 'true') {
+            // Check if user came from landing page or explicitly wants to login again
+            const fromLanding = document.referrer.includes('index.html') || document.referrer.includes('/');
+            const urlParams = new URLSearchParams(window.location.search);
+            const forceLogin = urlParams.get('force') === 'true';
+            
+            // Only auto-redirect if logged in AND not coming from landing page AND not forcing login
+            if ((isLoggedIn === 'true' || rememberMe === 'true') && !fromLanding && !forceLogin) {
                 window.location.href = 'dashboard.html';
             }
         });

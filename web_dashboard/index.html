@@ -613,6 +613,66 @@
                     });
             });
         }
+
+        // Allow users to access landing page even if logged in
+        // This ensures the landing page is always accessible
+        window.addEventListener('load', () => {
+            // Check if user came from a direct URL access or refresh
+            const urlParams = new URLSearchParams(window.location.search);
+            const forceHome = urlParams.get('home');
+            
+            // If user explicitly wants to see the home page, don't redirect
+            if (forceHome === 'true') {
+                // Clear the URL parameter for clean URLs
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
+            
+            // Optional: Add a small delay to prevent immediate redirects
+            // This gives users a chance to see the landing page
+            setTimeout(() => {
+                const isLoggedIn = sessionStorage.getItem('ecomonitor_logged_in');
+                const rememberMe = localStorage.getItem('ecomonitor_remember');
+                
+                // Only auto-redirect if user is logged in AND didn't explicitly visit home
+                if ((isLoggedIn === 'true' || rememberMe === 'true') && !document.referrer.includes('login.html')) {
+                    // Show a subtle notification that they can access dashboard
+                    showDashboardLink();
+                }
+            }, 1000);
+        });
+
+        // Show a subtle dashboard access link for logged-in users
+        function showDashboardLink() {
+            const dashboardLink = document.createElement('div');
+            dashboardLink.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: rgba(16, 185, 129, 0.9);
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    font-size: 14px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                " onclick="window.location.href='dashboard.html'" 
+                   onmouseover="this.style.transform='translateY(-2px)'"
+                   onmouseout="this.style.transform='translateY(0)'">
+                    📊 Go to Dashboard
+                </div>
+            `;
+            document.body.appendChild(dashboardLink);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                dashboardLink.style.opacity = '0';
+                setTimeout(() => dashboardLink.remove(), 300);
+            }, 5000);
+        }
     </script>
 </body>
 </html>
