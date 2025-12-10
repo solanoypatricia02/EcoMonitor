@@ -321,6 +321,142 @@
             font-weight: 500;
         }
 
+        /* About Section */
+        .about {
+            padding: 100px 40px;
+            background: #1e293b;
+        }
+
+        .about-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 80px;
+        }
+
+        .about-text h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 16px;
+            margin-top: 32px;
+        }
+
+        .about-text h3:first-child {
+            margin-top: 0;
+        }
+
+        .about-text p {
+            font-size: 16px;
+            color: #94a3b8;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .about-features {
+            display: grid;
+            gap: 24px;
+        }
+
+        .about-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .about-feature:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(16, 185, 129, 0.3);
+            transform: translateX(8px);
+        }
+
+        .about-feature-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .about-feature-content h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+        }
+
+        .about-feature-content p {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .about-tech-stack {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .about-tech-stack h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .tech-item {
+            text-align: center;
+            padding: 24px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .tech-category {
+            font-size: 14px;
+            font-weight: 600;
+            color: #10b981;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tech-list {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
         /* CTA Section */
         .cta {
             padding: 100px 40px;
@@ -438,6 +574,17 @@
                 grid-template-columns: 1fr;
             }
 
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                margin-bottom: 60px;
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
             .footer-content {
                 grid-template-columns: 1fr;
                 gap: 40px;
@@ -445,6 +592,43 @@
 
             .nav-links {
                 display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .about {
+                padding: 60px 20px;
+            }
+
+            .about-text h3 {
+                font-size: 20px;
+            }
+
+            .about-text p {
+                font-size: 15px;
+            }
+
+            .about-feature {
+                padding: 16px;
+            }
+
+            .about-feature-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .about-tech-stack {
+                padding: 24px 16px;
+            }
+
+            .tech-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .tech-item {
+                padding: 16px 12px;
             }
         }
     </style>
@@ -544,6 +728,102 @@
             <div class="stat-item">
                 <div class="stat-number">∞</div>
                 <div class="stat-label">Data Storage</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="section-header">
+            <div class="section-badge">About EcoMonitor</div>
+            <h2>Intelligent Environmental Monitoring</h2>
+            <p>Discover how our cutting-edge IoT platform revolutionizes environmental monitoring with real-time data collection and AI-powered insights.</p>
+        </div>
+        
+        <div class="about-content">
+            <div class="about-grid">
+                <div class="about-text">
+                    <h3>🌍 Our Mission</h3>
+                    <p>EcoMonitor empowers individuals and organizations to make data-driven decisions about their environment. By combining advanced IoT sensors with intelligent analytics, we provide real-time insights into air quality, temperature, and humidity levels.</p>
+                    
+                    <h3>🔬 The Technology</h3>
+                    <p>Our system utilizes ESP32 microcontrollers paired with high-precision sensors including the MQ135 air quality sensor. Data is transmitted securely to Firebase in real-time, where our AI algorithms analyze patterns and detect anomalies.</p>
+                    
+                    <h3>📊 Smart Analytics</h3>
+                    <p>Beyond simple data collection, EcoMonitor provides predictive analytics, trend analysis, and intelligent alerts. Our machine learning algorithms learn from your environment to provide personalized recommendations and early warning systems.</p>
+                </div>
+                
+                <div class="about-features">
+                    <div class="about-feature">
+                        <div class="about-feature-icon">⚡</div>
+                        <div class="about-feature-content">
+                            <h4>Real-Time Processing</h4>
+                            <p>Data updates every 10 seconds with instant alert notifications</p>
+                        </div>
+                    </div>
+                    
+                    <div class="about-feature">
+                        <div class="about-feature-icon">🛡️</div>
+                        <div class="about-feature-content">
+                            <h4>Secure & Reliable</h4>
+                            <p>Enterprise-grade security with 99.9% uptime guarantee</p>
+                        </div>
+                    </div>
+                    
+                    <div class="about-feature">
+                        <div class="about-feature-icon">🎯</div>
+                        <div class="about-feature-content">
+                            <h4>Customizable Thresholds</h4>
+                            <p>Set personalized alert levels for your specific environment</p>
+                        </div>
+                    </div>
+                    
+                    <div class="about-feature">
+                        <div class="about-feature-icon">📱</div>
+                        <div class="about-feature-content">
+                            <h4>Cross-Platform Access</h4>
+                            <p>Web dashboard, mobile PWA, and API access for integration</p>
+                        </div>
+                    </div>
+                    
+                    <div class="about-feature">
+                        <div class="about-feature-icon">🤖</div>
+                        <div class="about-feature-content">
+                            <h4>AI-Powered Insights</h4>
+                            <p>Machine learning algorithms provide predictive analytics</p>
+                        </div>
+                    </div>
+                    
+                    <div class="about-feature">
+                        <div class="about-feature-icon">📈</div>
+                        <div class="about-feature-content">
+                            <h4>Historical Analysis</h4>
+                            <p>Comprehensive data visualization and trend analysis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="about-tech-stack">
+                <h3>🛠️ Technology Stack</h3>
+                <div class="tech-grid">
+                    <div class="tech-item">
+                        <div class="tech-category">Hardware</div>
+                        <div class="tech-list">ESP32, MQ135 Sensor, DHT22</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-category">Backend</div>
+                        <div class="tech-list">Firebase, Python, Real-time Database</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-category">Frontend</div>
+                        <div class="tech-list">HTML5, CSS3, JavaScript, PWA</div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-category">Analytics</div>
+                        <div class="tech-list">Chart.js, AI Algorithms, PDF Reports</div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
